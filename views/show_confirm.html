@@ -1,0 +1,27 @@
+<html>
+	<head>
+		<title>URF Show Attendance</title>
+		<link rel="stylesheet" href="https://cdn.witch.gq/css/fork-awesome/fork-awesome.min.css" />
+		<link rel="stylesheet" href="static/style.css" />
+		<script src="https://cdn.witch.gq/js/vue.min.js"></script>
+	</head>
+	<body>
+		<div class="page" id="app-mount">
+			<div class="container">
+				<h2>URF Register</h2>
+				<transition>
+					<transition v-if="!signedIn">
+						<a class="button error" v-if="error"><i class="fa fa-times fa-2x"></i> There was a problem registering attendance.</a>
+						<a class="button" v-if="!loading && !error" v-on:click="theButton">I'm Here</a>
+						<a class="button loading" v-else><i class="fa fa-circle-o-notch fa-spin fa-fw fa-2x"></i></a>
+					</transition>
+					<transition v-else>{% raw %}
+						<a class="button granted"><i class="fa fa-check fa-2x"></i> Signed in as {{showName}}.</a>
+						{% endraw %}
+					</transition>
+				</transition>
+			</div>
+		</div>
+		<script src="static/client.js"></script>
+	</body>
+</html>
