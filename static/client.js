@@ -22,12 +22,21 @@
 							console.log(data);
 						});
 					} else {
-						this.error = "Failed to authenticate this computer.";
-						this.loading = false;
+						res.json().then((data) => {
+							this.error = data.error || "Failed to authenticate this computer.";
+							this.loading = false;
+						});
 					}
 				}).catch((err) => {
 					this.error = err || true;
 				});
+			},
+			reset: function() {
+				this.error = null;
+				this.loading = false;
+				this.signedIn = false;
+
+				// possible TODO: tell server we've reset after an error (or signed out?)
 			}
 		}
 	});

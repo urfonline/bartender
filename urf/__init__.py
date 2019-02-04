@@ -1,6 +1,21 @@
 import requests
 from datetime import datetime
 
+from .icecast import IcecastClient
+
+class Show:
+	def __init__(self, data):
+		self.id = data.get("id")
+		self.name = data.get("name")
+
+class Slot:
+	def __init__(self, data):
+		self.id = data.get("id")
+		self.start_time = datetime.strptime(data.get("startTime"), "%H:%M:%S")
+		self.end_time = datetime.strptime(data.get("endTime"), "%H:%M:%S")
+		self.day = data.get("day")
+		self.show = Show(data.get("show"))
+
 class URFClient:
 	def __init__(self):
 		pass
@@ -33,6 +48,6 @@ class URFClient:
 
 		for slot in slate["slots"]:
 			if slot["startTime"] == timestamp and slot["day"] == date.weekday():
-				return slot["show"]
+				return Slot(slot)
 
 		return None
