@@ -53,7 +53,7 @@
 		}
 	});
 
-	setTimeout(function() {
+	setInterval(function() {
 		app.checkStatus()
 	}, 30000);
 

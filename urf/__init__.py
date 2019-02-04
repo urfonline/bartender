@@ -1,5 +1,5 @@
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta, time
 
 from .icecast import IcecastClient
 from .database import *
@@ -16,8 +16,8 @@ class Show:
 class Slot:
 	def __init__(self, data):
 		self.id = data.get("id")
-		self.start_time = datetime.strptime(data.get("startTime"), "%H:%M:%S")
-		self.end_time = datetime.strptime(data.get("endTime"), "%H:%M:%S")
+		self.start_time = datetime.strptime(data.get("startTime"), "%H:%M:%S").time()
+		self.end_time = datetime.strptime(data.get("endTime"), "%H:%M:%S").time()
 		self.day = data.get("day")
 		self.show = Show(data.get("show"))
 
@@ -52,10 +52,12 @@ class URFClient:
 	def get_current_show(self):
 		slate = self.get_current_slate()
 		date = datetime.utcnow()
-		timestamp = date.strftime("%H:00:00")
+		ts = date.time()
 
 		for slot in slate["slots"]:
-			if slot["startTime"] == timestamp and slot["day"] == date.weekday():
-				return Slot(slot)
+			s = Slot(slot)
+
+			if s.start_time <= ts and s.end_time > ts and slot["day"] == date.weekday():
+				return s
 
 		return None

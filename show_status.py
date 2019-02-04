@@ -24,7 +24,8 @@ def register():
 		return jsonify({"error": "Failed to contact streaming server."}), 500
 
 	if status.primary_source.is_studio_live:
-		db.register_attendance(slot)
+		if db.get_logged_attendance(slot) is None:
+			db.register_attendance(slot)
 		
 		return jsonify({"show_name": slot.show.name}), 200
 	else:
