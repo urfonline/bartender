@@ -2,11 +2,16 @@ import requests
 from datetime import datetime
 
 from .icecast import IcecastClient
+from .database import *
+from .serialization import BartenderJSONEncoder
 
 class Show:
 	def __init__(self, data):
 		self.id = data.get("id")
 		self.name = data.get("name")
+
+	def to_dict(self):
+		return dict(id=self.id, name=self.name)
 
 class Slot:
 	def __init__(self, data):
@@ -15,6 +20,9 @@ class Slot:
 		self.end_time = datetime.strptime(data.get("endTime"), "%H:%M:%S")
 		self.day = data.get("day")
 		self.show = Show(data.get("show"))
+
+	def to_dict(self):
+		return dict(id=self.id, start_time=self.start_time, end_time=self.end_time, day=self.day)
 
 class URFClient:
 	def __init__(self):

@@ -10,7 +10,7 @@
 		methods: {
 			theButton: function() {
 				// todo: clientside verification
-				this.loading = true
+				this.loading = true;
 
 				fetch("/api/attend", { method: "POST" }).then((res) => {
 					if (res.ok) {
@@ -37,16 +37,25 @@
 				this.signedIn = false;
 
 				// possible TODO: tell server we've reset after an error (or signed out?)
+			},
+			checkStatus: function () {
+				fetch("/api/status")
+					.then((res) => res.json())
+					.then((data) => {
+						if (!data.attended) {
+							this.reset();
+						}
+					})
+					.catch((err) => {
+
+					});
 			}
 		}
 	});
 
 	setTimeout(function() {
-		var date = new Date();
-		if (date.getMinutes() == 58) {
-			app.signedIn = false;
-		}
-	}, 2000);
+		app.checkStatus()
+	}, 30000);
 
 	window.devApp = app;
 })();
