@@ -44,10 +44,14 @@
 					.then((data) => {
 						if (!data.attended) {
 							this.reset();
-						}
+						} else {
+						    this.signedIn = true;
+						    this.loading = false;
+                        }
 					})
 					.catch((err) => {
-
+					    // this.error = err;
+                        // Probably just ignore this one? Maybe flash a message
 					});
 			}
 		}

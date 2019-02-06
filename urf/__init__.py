@@ -22,7 +22,10 @@ class Slot:
 		self.show = Show(data.get("show"))
 
 	def to_dict(self):
-		return dict(id=self.id, start_time=self.start_time, end_time=self.end_time, day=self.day)
+		return dict(id=self.id,
+					start_time=self.start_time.isoformat(),
+					end_time=self.end_time.isoformat(),
+					day=self.day)
 
 class URFClient:
 	def __init__(self):

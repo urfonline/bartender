@@ -14,6 +14,10 @@ def index():
 
 	return render_template("show_confirm.html")
 
+@app.route("/admin")
+def admin():
+	return render_template("admin.html")  # TODO: Auth on this endpoint
+
 @app.route("/api/attend", methods=["POST"])
 def register():
 	db = get_connection()
@@ -40,7 +44,7 @@ def get_status():
 	row = db.get_logged_attendance(slot)
 
 	if row is None:
-		return jsonify({"attended": False, "show": slot.show}), 400
+		return jsonify({"attended": False, "slot": slot, "show": slot.show}), 400
 	else:
 		return jsonify(row)
 
