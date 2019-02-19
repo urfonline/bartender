@@ -1,0 +1,22 @@
+{% extends "admin_template.html" %}
+
+{% block content %}
+    <table class="ui celled table">
+        <thead>
+        <tr>
+            <th>Show Name</th>
+            <th>Last Attended</th>
+            <th>Total Attended</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for slot in slots %}
+                <tr>
+                    <td>{{ slot.show.name }}</td>
+                    <td>{{ register[slot.id].last_attended_ago }}</td>
+                    <td>{{ register[slot.id].num_attended }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

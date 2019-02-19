@@ -9,6 +9,7 @@ class Show:
 	def __init__(self, data):
 		self.id = data.get("id")
 		self.name = data.get("name")
+		self.slug = data.get("slug")
 
 	def to_dict(self):
 		return dict(id=self.id, name=self.name)
@@ -52,6 +53,12 @@ class URFClient:
 		}
 		""")["data"]["currentSlate"]
 
+	def get_all_shows(self):
+		slate = self.get_current_slate()
+
+		return list(map(lambda slot: Slot(slot), slate["slots"]))
+
+	midnight = time(0, 0, 0)
 	def get_current_show(self):
 		slate = self.get_current_slate()
 		date = datetime.utcnow()
@@ -60,7 +67,7 @@ class URFClient:
 		for slot in slate["slots"]:
 			s = Slot(slot)
 
-			if s.start_time <= ts and s.end_time > ts and slot["day"] == date.weekday():
+			if s.start_time <= ts and (s.end_time > ts or s.end_time == self.midnight) and slot["day"] == date.weekday():  # TODO: fix this
 				return s
 
 		return None
