@@ -37,6 +37,10 @@
 				this.signedIn = false;
 
 				// possible TODO: tell server we've reset after an error (or signed out?)
+				new Notification("Register Your Show!", {
+					body: "Remember to register your show!",
+					silent: true
+				});
 			},
 			checkStatus: function () {
 				fetch("/api/status")
@@ -62,4 +66,6 @@
 	}, 30000);
 
 	window.devApp = app;
+
+	Notification.requestPermission()
 })();
