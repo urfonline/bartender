@@ -1,22 +1,48 @@
-from flask import Flask, render_template, jsonify, g
+from flask import Flask, render_template, jsonify, g, request, redirect, url_for
 from urf import URFClient, IcecastClient, get_connection, BartenderJSONEncoder
-import requests
+from flask_dance.contrib.google import make_google_blueprint, google
+from configparser import ConfigParser
+
+config = ConfigParser()
+config.read("config.ini")
 
 app = Flask(__name__, template_folder="views")
+blueprint = make_google_blueprint(
+	client_id=config["oauth"]["client_id"],
+	client_secret=config["oauth"]["client_secret"],
+	scope=[
+		"https://www.googleapis.com/auth/plus.me",
+		"https://www.googleapis.com/auth/userinfo.email"
+	]
+)
+app.secret_key = config["app"]["secret_key"]
+app.register_blueprint(blueprint, url_prefix="/login")
+
 urf = URFClient()
 icecast = IcecastClient()
+
+allowed_ips = ["139.184.150.23", "127.0.0.1"]
 
 app.json_encoder = BartenderJSONEncoder
 
 @app.route("/")
 def index():
-	pass # TODO: verify that we're being accessed from the studio PC
+	if request.remote_addr not in allowed_ips:
+		return "Not Studio PC", 404
 
 	return render_template("show_confirm.html")
 
 @app.route("/admin")
 def admin():
-	return render_template("admin.html")  # TODO: Auth on this endpoint
+	if not google.authorized:
+		return redirect(url_for("google.login"))
+
+	db = get_connection()
+
+	slots = urf.get_all_shows()
+	attendance = db.get_show_data()
+
+	return render_template("admin_home.html", slots=slots, register=attendance)  # TODO: Auth on this endpoint
 
 @app.route("/api/attend", methods=["POST"])
 def register():
@@ -26,6 +52,9 @@ def register():
 
 	if status.primary_source is None:
 		return jsonify({"error": "Failed to contact streaming server."}), 500
+
+	if slot is None:
+		return jsonify({"error": "No active slot?"}), 500
 
 	if status.primary_source.is_studio_live:
 		if db.get_logged_attendance(slot) is None:
@@ -39,7 +68,9 @@ def register():
 def get_status():
 	db = get_connection()
 	slot = urf.get_current_show()
-	show_id = slot.show.id
+
+	if slot is None:
+		return jsonify({"attended": False, "slot": None, "show": None})
 
 	row = db.get_logged_attendance(slot)
 
