@@ -1,10 +1,10 @@
 from flask import Flask, render_template, jsonify, g, request, redirect, url_for
-from urf import URFClient, IcecastClient, get_connection, BartenderJSONEncoder
+from urf import URFClient, IcecastClient, get_connection, BartenderJSONEncoder, Slot
 from flask_dance.contrib.google import make_google_blueprint, google
 from configparser import ConfigParser
 
 config = ConfigParser()
-config.read("config.ini")
+config.read("config/config.ini")
 
 app = Flask(__name__, template_folder="views")
 blueprint = make_google_blueprint(
@@ -42,7 +42,9 @@ def admin():
 	slots = urf.get_all_shows()
 	attendance = db.get_show_data()
 
-	return render_template("admin_home.html", slots=slots, register=attendance)  # TODO: Auth on this endpoint
+	slots.sort(key=attendance.key_for(), reverse=True)
+
+	return render_template("admin_home.html", slots=slots, register=attendance)
 
 @app.route("/api/attend", methods=["POST"])
 def register():

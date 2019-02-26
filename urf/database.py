@@ -119,8 +119,9 @@ class SqliteDatabaseConnection(DatabaseConnection):
 				show = ShowData(d)
 				slots[show.slot_id] = show
 
-			return Proxy(slots)
-		except:
+			return SlotAttendanceTable(slots)
+		except Exception as ex:
+			print(ex)
 			return {}
 		finally:
 			op.close()
@@ -148,7 +149,11 @@ class ShowData:
 		self.slot_id = data[0]
 		self.num_attended = data[1]
 		self.last_attended = datetime.utcfromtimestamp(data[2])
-		self.last_attended_ago = timeago.format(self.last_attended, datetime.utcnow())
+
+		if data[2] == 0:
+			self.last_attended_ago = "Never"
+		else:
+			self.last_attended_ago = timeago.format(self.last_attended, datetime.utcnow())
 
 	def to_dict(self):
 		return {
@@ -157,11 +162,16 @@ class ShowData:
 			"last_attended": self.last_attended.timestamp()
 		}
 
-class Proxy:
+class SlotAttendanceTable:
 	def __init__(self, data: dict):
 		self.data = data
 
+	def key_for(self):
+		def key(slot):
+			return self[slot.id].num_attended
+		return key
+
 	def __getitem__(self, key):
-		return self.data.get(key, { "num_attended": 0, "last_attended": 0, "last_attended_ago": "Never" })
+		return self.data.get(key, ShowData([key, 0, 0]))
 
 	__getattr__ = __getitem__
