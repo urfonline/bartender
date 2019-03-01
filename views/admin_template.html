@@ -24,8 +24,12 @@
             </a>
             <a class="item" href="/logout">
                 Log Out
-                <i class="logout icon"></i>
+                <i class="sign out icon"></i>
             </a>
+            <div class="disabled item">
+                {{ user.displayName }}
+                <i class="user icon"></i>
+            </div>
             {% block menu_items %}{% endblock %}
         </div>
         <div class="pusher">

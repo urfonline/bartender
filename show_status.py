@@ -11,9 +11,11 @@ blueprint = make_google_blueprint(
 	client_id=config["oauth"]["client_id"],
 	client_secret=config["oauth"]["client_secret"],
 	scope=[
-		"https://www.googleapis.com/auth/plus.me",
-		"https://www.googleapis.com/auth/userinfo.email"
-	]
+		"openid",
+		"https://www.googleapis.com/auth/userinfo.email",
+		"https://www.googleapis.com/auth/userinfo.profile"
+	],
+	redirect_to="admin"
 )
 app.secret_key = config["app"]["secret_key"]
 app.register_blueprint(blueprint, url_prefix="/login")
@@ -37,6 +39,12 @@ def admin():
 	if not google.authorized:
 		return redirect(url_for("google.login"))
 
+	r = google.get("https://people.googleapis.com/v1/people/me?personFields=names")
+	if not r.ok:
+		print(r.text)
+		return redirect(url_for("google.login"))
+		
+	user_data = r.json()
 	db = get_connection()
 
 	slots = urf.get_all_shows()
@@ -44,7 +52,22 @@ def admin():
 
 	slots.sort(key=attendance.key_for(), reverse=True)
 
-	return render_template("admin_home.html", slots=slots, register=attendance)
+	return render_template("admin_home.html", slots=slots, register=attendance, user=user_data["names"][0])
+
+@app.route("/logout")
+def logout():
+	token = blueprint.token["access_token"]
+	resp = google.post(
+		"https://accounts.google.com/o/oauth2/revoke",
+		params={"token": token},
+		headers={"Content-Type": "application/x-www-form-urlencoded"}
+	)
+
+	print(resp.text)
+	if resp.ok:
+		return "Logged out.", 200
+	else:
+		return "There was a problem logging out :(", 500
 
 @app.route("/api/attend", methods=["POST"])
 def register():
