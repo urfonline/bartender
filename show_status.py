@@ -54,6 +54,25 @@ def admin():
 
 	return render_template("admin_home.html", slots=slots, register=attendance, user=user_data["names"][0])
 
+@app.route("/admin/actions", methods=["POST"])
+def admin_force_attend():
+	if not google.authorized:
+		return redirect(url_for("google.login"))
+
+	if request.form["action"] == "force_attend":
+		db = get_connection()
+		slot = urf.get_current_show()
+
+		if slot is None:
+			raise Exception("No slot was found?")
+
+		if db.get_logged_attendance(slot) is None:
+			db.register_attendance(slot)
+
+			return redirect(url_for("admin"))
+		else:
+			raise Exception("Slot already registered!")
+
 @app.route("/logout")
 def logout():
 	token = blueprint.token["access_token"]
@@ -102,7 +121,7 @@ def get_status():
 	if row is None:
 		return jsonify({"attended": False, "slot": slot, "show": slot.show}), 400
 	else:
-		return jsonify(row)
+		return jsonify({"attended": row.attended, "slot": slot, "show": slot.show, "signed_in_time": row.signed_in_time})
 
 @app.teardown_appcontext
 def close_connection(exc):

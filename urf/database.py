@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import g
 import sqlite3
 import timeago
@@ -42,7 +42,7 @@ class SqliteDatabaseConnection(DatabaseConnection):
 	def register_attendance(self, slot):
 		op = self.conn.cursor()
 		try:
-			date = datetime.utcnow()
+			date = datetime.now(timezone.utc)
 
 			op.execute("INSERT INTO attendance VALUES (?, ?, ?, ?)", [date.strftime("%W"), slot.id, 1, int(date.timestamp())])
 		except Exception as err:
@@ -134,7 +134,7 @@ class RegisterRow:
 		self.week = data[0]
 		self.slot_id = data[1]
 		self.attended = bool(data[2])
-		self.signed_in_time = datetime.utcfromtimestamp(data[3])
+		self.signed_in_time = datetime.fromtimestamp(data[3], tz=timezone.utc)
 
 	def to_dict(self):
 		return {
@@ -148,12 +148,12 @@ class ShowData:
 	def __init__(self, data):
 		self.slot_id = data[0]
 		self.num_attended = data[1]
-		self.last_attended = datetime.utcfromtimestamp(data[2])
+		self.last_attended = datetime.fromtimestamp(data[2], tz=timezone.utc)
 
 		if data[2] == 0:
 			self.last_attended_ago = "Never"
 		else:
-			self.last_attended_ago = timeago.format(self.last_attended, datetime.utcnow())
+			self.last_attended_ago = timeago.format(self.last_attended, datetime.now(timezone.utc))
 
 	def to_dict(self):
 		return {

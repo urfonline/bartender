@@ -51,6 +51,10 @@
 						} else {
 						    this.signedIn = true;
 						    this.loading = false;
+
+							if (data.show) {
+								this.showName = data.show.name;
+							}
                         }
 					})
 					.catch((err) => {
