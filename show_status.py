@@ -39,9 +39,10 @@ def admin():
 	if not google.authorized:
 		return redirect(url_for("google.login"))
 
-	r = google.get("https://people.googleapis.com/v1/people/me?personFields=names")
-	if not r.ok:
-		print(r.text)
+	try:
+		r = google.get("https://people.googleapis.com/v1/people/me?personFields=names")
+		r.raise_for_status()
+	except Exception:
 		return redirect(url_for("google.login"))
 		
 	user_data = r.json()
@@ -82,7 +83,6 @@ def logout():
 		headers={"Content-Type": "application/x-www-form-urlencoded"}
 	)
 
-	print(resp.text)
 	if resp.ok:
 		return "Logged out.", 200
 	else:
@@ -90,6 +90,9 @@ def logout():
 
 @app.route("/api/attend", methods=["POST"])
 def register():
+	if request.remote_addr not in allowed_ips:
+		return jsonify({"error": "Invalid remote IP address"}), 400
+	
 	db = get_connection()
 	slot = urf.get_current_show()
 	status = icecast.fetch_status()

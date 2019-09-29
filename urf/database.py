@@ -46,8 +46,8 @@ class SqliteDatabaseConnection(DatabaseConnection):
 
 			op.execute("INSERT INTO attendance VALUES (?, ?, ?, ?)", [date.strftime("%W"), slot.id, 1, int(date.timestamp())])
 		except Exception as err:
-			print(err)
 			self.conn.rollback()
+			raise err
 		else:
 			self.conn.commit()
 
