@@ -71,5 +71,6 @@
 
 	window.devApp = app;
 
-	Notification.requestPermission()
+	Notification.requestPermission();
+	app.checkStatus();
 })();

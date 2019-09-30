@@ -1,5 +1,6 @@
 import requests
 from datetime import datetime, timedelta, time
+from dateutil.tz import gettz
 
 from .icecast import IcecastClient
 from .database import *
@@ -61,7 +62,7 @@ class URFClient:
 	midnight = time(0, 0, 0)
 	def get_current_show(self):
 		slate = self.get_current_slate()
-		date = datetime.utcnow()
+		date = datetime.now(gettz("Europe/London"))
 		ts = date.time()
 
 		for slot in slate["slots"]:

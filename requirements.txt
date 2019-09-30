@@ -9,6 +9,7 @@ Jinja2==2.10
 lazy==1.4
 MarkupSafe==1.1.0
 oauthlib==3.0.1
+python-dateutil==2.8.0
 requests==2.21.0
 requests-oauthlib==1.2.0
 six==1.12.0
