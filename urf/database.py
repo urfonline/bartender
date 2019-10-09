@@ -12,6 +12,8 @@ def get_connection():
 	if db is None:
 		db = SqliteDatabaseConnection()  # TODO: Swappable connection adapters
 
+	setattr(g, "_database", db)
+
 	return db
 
 class DatabaseConnection(metaclass=ABCMeta):
@@ -37,7 +39,7 @@ class DatabaseConnection(metaclass=ABCMeta):
 
 class SqliteDatabaseConnection(DatabaseConnection):
 	def __init__(self):
-		self.conn = sqlite3.connect("shows.db")
+		self.conn = sqlite3.connect("data/shows.db")
 
 	def register_attendance(self, slot):
 		op = self.conn.cursor()
