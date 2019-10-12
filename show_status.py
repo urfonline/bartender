@@ -29,7 +29,7 @@ app.json_encoder = BartenderJSONEncoder
 
 @app.route("/")
 def index():
-	if request.remote_addr not in allowed_ips:
+	if request.access_route[0] not in allowed_ips:
 		return "Not Studio PC", 404
 
 	return render_template("show_confirm.html")
@@ -90,7 +90,7 @@ def logout():
 
 @app.route("/api/attend", methods=["POST"])
 def register():
-	if request.remote_addr not in allowed_ips:
+	if request.access_route[0] not in allowed_ips:
 		return jsonify({"error": "Invalid remote IP address"}), 400
 	
 	db = get_connection()
