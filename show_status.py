@@ -1,5 +1,6 @@
 from flask import Flask, render_template, jsonify, g, request, redirect, url_for
 from urf import URFClient, IcecastClient, get_connection, BartenderJSONEncoder, Slot
+from urf.wsgi_util import ReverseProxiedApp
 from flask_dance.contrib.google import make_google_blueprint, google
 from configparser import ConfigParser
 
@@ -7,6 +8,8 @@ config = ConfigParser()
 config.read("config/config.ini")
 
 app = Flask(__name__, template_folder="views")
+app.wsgi_app = ReverseProxiedApp(app.wsgi_app, config["oauth"]["scheme"])
+
 blueprint = make_google_blueprint(
 	client_id=config["oauth"]["client_id"],
 	client_secret=config["oauth"]["client_secret"],
