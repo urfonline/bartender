@@ -5,7 +5,7 @@ RUN mkdir /app/config && mkdir /app/data
 COPY . /app
 
 RUN pip install -r requirements.txt
-RUN pip install gunicorn
+RUN pip install gunicorn==19.9.0
 
 EXPOSE 8000
 VOLUME /app/config /app/data
