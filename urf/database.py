@@ -109,7 +109,7 @@ class SqliteDatabaseConnection(DatabaseConnection):
 		op = self.conn.cursor()
 
 		try:
-			op.execute("SELECT slot_id, COUNT(week), logged_date FROM attendance GROUP BY slot_id")
+			op.execute("SELECT slot_id, COUNT(week), MAX(logged_date) FROM attendance GROUP BY slot_id")
 			rows = op.fetchall()
 
 			if rows is None:
