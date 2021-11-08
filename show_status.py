@@ -98,15 +98,16 @@ def register():
 	
 	db = get_connection()
 	slot = urf.get_current_show()
-	status = icecast.fetch_status()
+	#status = icecast.fetch_status()
 
-	if status.primary_source is None:
-		return jsonify({"error": "Failed to contact streaming server."}), 500
+	#if status.primary_source is None:
+	#	return jsonify({"error": "Failed to contact streaming server."}), 500
 
 	if slot is None:
 		return jsonify({"error": "No active slot?"}), 500
 
-	if status.primary_source.is_studio_live:
+	# temporary
+	if True:
 		if db.get_logged_attendance(slot) is None:
 			db.register_attendance(slot)
 		

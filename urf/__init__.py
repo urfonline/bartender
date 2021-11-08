@@ -43,13 +43,15 @@ class URFClient:
 	def get_current_slate(self):
 		return self.make_graphql_request("""
 		query ScheduleQuery {
-		  currentSlate {
-		    slots {
-		      id, startTime, endTime, day
-		      show {
-		        id, name, slug
+		  stream(slug: "urf-online") {
+		  	slate {
+		      slots {
+		        id, startTime, endTime, day
+		        show {
+		          id, name, slug
+		        }
 		      }
-		    }
+			}
 		  }
 		}
 		""")["data"]["currentSlate"]
