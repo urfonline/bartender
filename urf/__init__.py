@@ -54,7 +54,7 @@ class URFClient:
 			}
 		  }
 		}
-		""")["data"]["currentSlate"]
+		""")["data"]["stream"]["slate"]
 
 	def get_all_shows(self):
 		slate = self.get_current_slate()
